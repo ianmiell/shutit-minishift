@@ -34,11 +34,12 @@ class shutit_minishift(ShutItModule):
 		shutit.send('minishift profile set minishift')
 		if shutit.send_and_get_output('''minishift status  | grep ^Minishift | awk {'print $2'}''') == 'Running':
 			shutit.pause_point('minishift already running, either CTRL-] to continue with it, or CTRL-Q to quit and run minishift delete to remove before re-running')
-		shutit.send('minishift start')
+		shutit.send('minishift start --cpus 4 --memory 18GB')
 		shutit.send('eval $(minishift oc-env)')
 		minishift_ip = shutit.send_and_get_output('minishift ip')
-		shutit.log('\n\nminishift ip is: ' + minishift_ip + '\n\n... go to: \n\nhttps://' + minishift_ip + ':8443/console\n\nto see the console',logging.CRITICAL)
 		shutit.pause_point('\n\nminishift ip is: ' + minishift_ip + '\n\n... go to: \n\nhttps://' + minishift_ip + ':8443/console\n\nto see the console')
+		if shutit.cfg[self.module_id]['do_cicd']:
+			cicd.do_cicd(shutit)
 
 		return True
 

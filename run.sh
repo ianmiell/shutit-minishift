@@ -23,7 +23,7 @@ then
 	git submodule init
 	git submodule update
 	$SHUTIT build --echo -d bash \
-	    -s techniques.shutit_minikube.shutit_minikube do_cicd yes \
+	    -s shutit-minishift.shutit_minishift.shutit_minishift do_cicd yes \
 		"$@"
 else
 	usage
