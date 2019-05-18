@@ -2,24 +2,30 @@ import logging
 from shutit_module import ShutItModule
 
 from minishift_library import cicd
+from minishift_library import staticip
 
 
 class shutit_minishift(ShutItModule):
 
 	def build(self, shutit):
 		# Assumes Mac, and brew.
-		if shutit.send_and_get_output('uname') != 'Darwin':
-			shutit.exit('not darwin')
-		try:
-			pw = open('secret').read().strip()
-		except IOError:
-			shutit.log('''\n================================================================================\nWARNING! IF THIS DOES NOT WORK YOU MAY NEED TO SET UP A 'secret' FILE IN THIS FOLDER!\n================================================================================''',level=logging.CRITICAL)
-			pw = 'nopass'
-		shutit.send('brew install --force docker-machine-driver-xhyve')
-		shutit.login(command='sudo su', password=pw)
-		shutit.send('sudo chown root:wheel $(brew --prefix)/opt/docker-machine-driver-xhyve/bin/docker-machine-driver-xhyve')
-		shutit.send('sudo chmod u+s $(brew --prefix)/opt/docker-machine-driver-xhyve/bin/docker-machine-driver-xhyve')
-		shutit.logout()
+		platform = shutit.send_and_get_output('uname')
+		if platform == 'Darwin':
+			try:
+				pw = open('secret').read().strip()
+			except IOError:
+				shutit.log('''\n================================================================================\nWARNING! IF THIS DOES NOT WORK YOU MAY NEED TO SET UP A 'secret' FILE IN THIS FOLDER!\n================================================================================''',level=logging.CRITICAL)
+				pw = 'nopass'
+			shutit.send('brew install --force docker-machine-driver-xhyve || brew install --force docker-machine-driver-xhyve')
+			shutit.login(command='sudo su', password=pw)
+			shutit.send('sudo chown root:wheel $(brew --prefix)/opt/docker-machine-driver-xhyve/bin/docker-machine-driver-xhyve')
+			shutit.send('sudo chmod u+s $(brew --prefix)/opt/docker-machine-driver-xhyve/bin/docker-machine-driver-xhyve')
+			shutit.logout()
+		elif platform == 'Linux':
+			# See: https://www.novatec-gmbh.de/en/blog/getting-started-minishift-openshift-origin-one-vm/
+			# Going to assume it's already there.
+			if not shutit.command_available('minishift'):
+				shutit.pause_point('Need to install minishift, see: https://www.novatec-gmbh.de/en/blog/getting-started-minishift-openshift-origin-one-vm/')
 		if not shutit.command_available('oc'):
 			shutit.send('wget -nv https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-client-tools-v3.11.0-0cbc58b-mac.zip')
 			shutit.send('unzip openshift-origin-client-tools-v3.11.0-0cbc58b-mac.zip')
@@ -30,7 +36,7 @@ class shutit_minishift(ShutItModule):
 			shutit.send('rm ' + wd + '/openshift-origin-client-tools-v3.11.0-0cbc58b-mac.zip')
 			shutit.logout()
 			shutit.pause_point('')
-		shutit.send('brew cask install --force minishift')
+		shutit.send('brew cask install --force minishift || brew cast upgrade --force minishift')
 		shutit.send('minishift profile set minishift')
 		if shutit.send_and_get_output('''minishift status  | grep ^Minishift | awk {'print $2'}''') == 'Running':
 			shutit.pause_point('minishift already running, either CTRL-] to continue with it, or CTRL-Q to quit and run minishift delete to remove before re-running')
@@ -40,11 +46,12 @@ class shutit_minishift(ShutItModule):
 		shutit.pause_point('\n\nminishift ip is: ' + minishift_ip + '\n\n... go to: \n\nhttps://' + minishift_ip + ':8443/console\n\nto see the console')
 		if shutit.cfg[self.module_id]['do_cicd']:
 			cicd.do_cicd(shutit)
-
+		if shutit.cfg[self.module_id]['do_staticip']:
+			staticip.do_staticip(shutit)
 		return True
 
 	def get_config(self, shutit):
-		for do in ('cicd',):
+		for do in ('cicd','staticip',):
 			shutit.get_config(self.module_id,'do_' + do,boolean=True,default=False)
 		return True
 
