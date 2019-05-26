@@ -29,7 +29,7 @@ class shutit_minishift(ShutItModule):
 				shutit.pause_point('Need to install minishift, see: https://www.novatec-gmbh.de/en/blog/getting-started-minishift-openshift-origin-one-vm/')
 		if not shutit.command_available('oc'):
 			shutit.send('wget -nv https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-client-tools-v3.11.0-0cbc58b-mac.zip')
-			shutit.multisend('unzip openshift-origin-client-tools-v3.11.0-0cbc58b-mac.zip',{'replace':'y')
+			shutit.multisend('unzip openshift-origin-client-tools-v3.11.0-0cbc58b-mac.zip',{'replace':'y'})
 			wd = shutit.send_and_get_output('pwd')
 			shutit.login(command='sudo su', password=pw)
 			shutit.send('mv ' + wd + '/oc /usr/local/bin')
@@ -49,6 +49,8 @@ class shutit_minishift(ShutItModule):
 			cicd.do_cicd(shutit)
 		if shutit.cfg[self.module_id]['do_staticip']:
 			staticip.do_staticip(shutit)
+		if shutit.cfg[self.module_id]['do_kopf']:
+			staticip.do_kopf(shutit)
 		return True
 
 	def get_config(self, shutit):
