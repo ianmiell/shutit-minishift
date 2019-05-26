@@ -54,7 +54,7 @@ class shutit_minishift(ShutItModule):
 		if shutit.cfg[self.module_id]['do_staticip']:
 			staticip.do_staticip(shutit)
 		if shutit.cfg[self.module_id]['do_kopf']:
-			staticip.do_kopf(shutit)
+			kopf.do_kopf(shutit)
 		return True
 
 	def get_config(self, shutit):
