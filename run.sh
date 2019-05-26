@@ -14,22 +14,18 @@ Where BUILD is one of:
 
 - cicd                     - Run CI/CD demo
 - static                   - Run StaticIP demo
+- kopf                     - Run kopf demo
 
 END
 }
 BUILD=$1
 shift
-if [[ ${BUILD} = 'cicd' ]]
+if [[ ${BUILD} != '' ]]
 then
 	git submodule init
 	git submodule update
 	$SHUTIT build --echo -d bash \
-	    -s shutit-minishift.shutit_minishift.shutit_minishift do_cicd yes \
-		"$@"
-elif [[ ${BUILD} = 'staticip' ]]
-then
-	$SHUTIT build --echo -d bash \
-	    -s shutit-minishift.shutit_minishift.shutit_minishift do_cicd yes \
+	    -s shutit-minishift.shutit_minishift.shutit_minishift do_${BUILD} yes \
 		"$@"
 else
 	usage
