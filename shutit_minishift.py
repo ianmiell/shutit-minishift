@@ -17,7 +17,7 @@ class shutit_minishift(ShutItModule):
 			except IOError:
 				shutit.log('''\n================================================================================\nWARNING! IF THIS DOES NOT WORK YOU MAY NEED TO SET UP A 'secret' FILE IN THIS FOLDER!\n================================================================================''',level=logging.CRITICAL)
 				pw = 'nopass'
-			shutit.send('brew install --force docker-machine-driver-xhyve || brew install --force docker-machine-driver-xhyve')
+			shutit.send('brew install --force docker-machine-driver-xhyve')
 			shutit.login(command='sudo su', password=pw)
 			shutit.send('sudo chown root:wheel $(brew --prefix)/opt/docker-machine-driver-xhyve/bin/docker-machine-driver-xhyve')
 			shutit.send('sudo chmod u+s $(brew --prefix)/opt/docker-machine-driver-xhyve/bin/docker-machine-driver-xhyve')
@@ -29,7 +29,7 @@ class shutit_minishift(ShutItModule):
 				shutit.pause_point('Need to install minishift, see: https://www.novatec-gmbh.de/en/blog/getting-started-minishift-openshift-origin-one-vm/')
 		if not shutit.command_available('oc'):
 			shutit.send('wget -nv https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-client-tools-v3.11.0-0cbc58b-mac.zip')
-			shutit.send('unzip openshift-origin-client-tools-v3.11.0-0cbc58b-mac.zip')
+			shutit.multisend('unzip openshift-origin-client-tools-v3.11.0-0cbc58b-mac.zip',{'replace':'y')
 			wd = shutit.send_and_get_output('pwd')
 			shutit.login(command='sudo su', password=pw)
 			shutit.send('mv ' + wd + '/oc /usr/local/bin')
