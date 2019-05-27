@@ -1,8 +1,9 @@
 def do_kopf(s):
 	# Prep - log in as admin
 	s.send('oc login -u system:admin')
-	# Prep - install kopf
+	# Prep - install kopf and kubernetes
 	s.send('pip install kopf')
+	s.send('pip install kubernetes')
 	s.send('rm -rf kopf_tmp')
 	s.send('mkdir kopf_tmp')
 	s.send('cd kopf_tmp')
