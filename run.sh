@@ -13,9 +13,8 @@ $0 BUILD
 Where BUILD is one of:
 
 - cicd                     - Run CI/CD demo
+- static                   - Run StaticIP demo
 - kopf                     - Run kopf demo
-- staticip                 - Run StaticIP demo
-- helm_flux                - helm_flux
 
 END
 }
@@ -27,6 +26,7 @@ then
 	git submodule update
 	$SHUTIT build --echo -d bash \
 	    -s shutit-minishift.shutit_minishift.shutit_minishift do_${BUILD} yes \
+		"$@"
 else
 	usage
 	exit 1
