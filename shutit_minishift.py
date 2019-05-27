@@ -4,6 +4,7 @@ from shutit_module import ShutItModule
 from minishift_library import cicd
 from minishift_library import staticip
 from minishift_library import kopf
+from minishift_library import helmflux
 
 
 class shutit_minishift(ShutItModule):
@@ -55,10 +56,12 @@ class shutit_minishift(ShutItModule):
 			staticip.do_staticip(shutit)
 		if shutit.cfg[self.module_id]['do_kopf']:
 			kopf.do_kopf(shutit)
+		if shutit.cfg[self.module_id]['do_helmflux']:
+			helmflux.do_helmflux(shutit)
 		return True
 
 	def get_config(self, shutit):
-		for do in ('cicd','staticip','kopf',):
+		for do in ('cicd','staticip','kopf','helmflux',):
 			shutit.get_config(self.module_id,'do_' + do,boolean=True,default=False)
 		return True
 
