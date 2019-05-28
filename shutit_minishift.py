@@ -5,6 +5,7 @@ from minishift_library import cicd
 from minishift_library import staticip
 from minishift_library import kopf
 from minishift_library import helmflux
+from minishift_library import networkpolicy
 
 
 class shutit_minishift(ShutItModule):
@@ -58,10 +59,12 @@ class shutit_minishift(ShutItModule):
 			kopf.do_kopf(shutit)
 		if shutit.cfg[self.module_id]['do_helmflux']:
 			helmflux.do_helmflux(shutit)
+		if shutit.cfg[self.module_id]['do_networkpolicy']:
+			networkpolicy.do_networkpolicy(shutit)
 		return True
 
 	def get_config(self, shutit):
-		for do in ('cicd','staticip','kopf','helmflux',):
+		for do in ('cicd','staticip','kopf','helmflux','networkpolicy',):
 			shutit.get_config(self.module_id,'do_' + do,boolean=True,default=False)
 		return True
 

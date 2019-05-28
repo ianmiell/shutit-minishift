@@ -68,6 +68,10 @@ metadata:
   name: tenant
 ''')
 	s.send('kubectl create -f rbac-config-ns-' + tenant_ns + '.yaml -n ' + tenant_ns)
+	# Get the uid range
+	uid_range = s.send_and_get_output(r"""oc get project tenant -o json | jq -r '.metadata.annotations."openshift.io/sa.scc.uid-range"'""")
+	#TODO: alter and update it to have only one user id.
+
 	# Set up rbac appropriately in prep for flux global to be created, bound to the namespace where appropriate.
 	# Required to allow fluxctl to work - need to wait for https://github.com/weaveworks/flux/pull/1668 to land to enable whitelisting of namespaces
 	s.send_file('rbac-config-' + tenant_ns + '-cluster.yaml','''kind: ClusterRole

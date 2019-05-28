@@ -15,6 +15,7 @@ Where BUILD is one of:
 - cicd                     - Run CI/CD demo
 - static                   - Run StaticIP demo
 - kopf                     - Run kopf demo
+- networkpolicy            - Run networkpolicy demo
 
 END
 }
