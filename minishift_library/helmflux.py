@@ -6,13 +6,16 @@ import os
 import time
 
 def do_cleanup(s):
-	shutit.send('kubectl delete clusterrolebinding tiller || true')
-	shutit.send('kubectl delete sa tiller || true')
-	shutit.send('kubectl delete ns tenant || true')
+	s.send('kubectl delete clusterrolebinding tiller || true')
+	s.send('kubectl delete sa tiller || true')
+	s.send('kubectl delete ns tenant || true')
 
 def do_helmflux(s):
 
 	do_cleanup(s)
+
+	# Log in as admin
+	s.send('oc login -u system:admin')
 
 	# Parameterise the tenant namespace
 	tenant_ns = 'tenant'
@@ -118,5 +121,6 @@ subjects:
 	r.create_key('auto-key-' + str(int(time.time())), fluxctl_identity, read_only=False)
 
 	s.send('fluxctl list-workloads -a --k8s-fwd-ns flux')
+	s.send('sleep 60',note='Wait until all set up')
 	s.send('fluxctl sync --k8s-fwd-ns tenant')
 	s.pause_point('Now flux in ' + tenant_ns + ' ns?')
