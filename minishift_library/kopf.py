@@ -48,7 +48,9 @@ metadata:
 @kopf.on.create('zalando.org', 'v1', 'ephemeralvolumeclaims')
 def create_fn(body, **kwargs):
     print(f"A handler is called with body: {body}")''')
-	s.pause_point('now run: kopf run ephemeral.py --verbose &, then in another terminal oc delete evc and watch it handle.')
+	s.send('kopf run ephemeral.py --verbose 2> logs &')
+	s.send('sleep 5 && oc delete evc --all')
+	#s.pause_point('tail -f logs')
 	# Create a new claim
 	s.send_file('evc.yaml','''apiVersion: zalando.org/v1
 kind: EphemeralVolumeClaim
@@ -74,9 +76,10 @@ spec:
 	s.send_file('ephemeral.py','''import kopf
 import kubernetes
 import yaml
+import os
 
 @kopf.on.create('zalando.org', 'v1', 'ephemeralvolumeclaims')
-def create_fn(meta, spec, namespace, logger, **kwargs):
+def create_fn(meta, spec, logger, **kwargs):
     name = meta.get('name')
     size = spec.get('size')
     if not size:
@@ -94,6 +97,8 @@ def create_fn(meta, spec, namespace, logger, **kwargs):
     )
 
     logger.info(f"PVC child is created: %s", obj)''')
+	s.send('kill %1')
+	s.send('kopf run ephemeral.py --verbose 2> logs &')
 	s.send('kubectl apply -f evc.yaml')
 	s.send('sleep 5 && kubectl get pvc')
-	s.pause_point('')
+	s.pause_point('pvc should have been created - check logs file')
