@@ -19,7 +19,7 @@ spec:
 # TODO: ^^ apply to tenant namespace TODO: create tenant nses
 # TODO: get admin
 
-	# Must also label default namespace:
+	# Must also label default namespace:
 	s.send('oc label namespace default name=default')
 
 # TODO: Microsegmentation controller? metacontroller?
