@@ -11,7 +11,6 @@ from minishift_library import networkpolicy
 class shutit_minishift(ShutItModule):
 
 	def build(self, shutit):
-		# Assumes Mac, and brew.
 		platform = shutit.send_and_get_output('uname')
 		try:
 			pw = open('secret').read().strip()
@@ -42,15 +41,16 @@ class shutit_minishift(ShutItModule):
 			shutit.send('wget -nv https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-client-tools-v3.11.0-0cbc58b-mac.zip')
 			shutit.multisend('unzip openshift-origin-client-tools-v3.11.0-0cbc58b-mac.zip',{'replace':'y'})
 			wd = shutit.send_and_get_output('pwd')
-			shutit.send('brew install --force docker-machine-driver-xhyve')
-			shutit.login(command='sudo su', password=pw)
-			shutit.send('sudo chown root:wheel $(brew --prefix)/opt/docker-machine-driver-xhyve/bin/docker-machine-driver-xhyve')
+                        if platform == 'Darwin':
+			    shutit.send('brew install --force docker-machine-driver-xhyve')
+			    shutit.login(command='sudo su', password=pw)
+			    shutit.send('sudo chown root:wheel $(brew --prefix)/opt/docker-machine-driver-xhyve/bin/docker-machine-driver-xhyve')
+			    shutit.logout()
 			shutit.login(command='sudo su', password=pw)
 			shutit.send('mv ' + wd + '/oc /usr/local/bin')
 			shutit.send('mv ' + wd + '/kubectl /usr/local/bin')
 			shutit.send('rm ' + wd + '/openshift-origin-client-tools-v3.11.0-0cbc58b-mac.zip')
 			shutit.logout()
-			shutit.pause_point('')
 		shutit.send('eval $(minishift oc-env)')
 		minishift_ip = shutit.send_and_get_output('minishift ip')
 		shutit.pause_point('\n\nminishift ip is: ' + minishift_ip + '\n\n... go to: \n\nhttps://' + minishift_ip + ':8443/console\n\nto see the console')
