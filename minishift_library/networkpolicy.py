@@ -17,7 +17,7 @@ spec:
 
 # TODO: project creation template?
 # TODO: ^^ apply to tenant namespace TODO: create tenant nses
-# TODO: get admin
+# TODO: get admin
 
 	# Must also label default namespace:
 	s.send('oc label namespace default name=default')
